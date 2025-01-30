@@ -1,0 +1,83 @@
+// ADT Stack interface
+public interface Stack<E> {
+    void push(E item);    // Add item to the top of the stack
+    E pop() throws EmptyStackException;    // Remove and return the top item from the stack
+    E peek() throws EmptyStackException;   // Return the top item from the stack without removing it
+    boolean isEmpty();    // Check if the stack is empty
+    int size();    // Get the number of items in the stack
+}
+import java.util.EmptyStackException;
+
+// Array-based Stack implementation
+public class ArrayStack<E> implements Stack<E> {
+    private static final int DEFAULT_CAPACITY = 10;
+    private E[] elements;
+    private int size;
+
+    @SuppressWarnings("unchecked")
+    public ArrayStack(int capacity) {
+        elements = (E[]) new Object[capacity];
+        size = 0;
+    }
+
+    public ArrayStack() {
+        this(DEFAULT_CAPACITY);
+    }
+
+    @Override
+    public void push(E item) {
+        if (size == elements.length) {
+            resize(2 * elements.length); // Double the array size if it's full
+        }
+        elements[size++] = item;
+    }
+
+    @Override
+    public E pop() throws EmptyStackException {
+        if (isEmpty()) {
+            throw new EmptyStackException();
+        }
+        E item = elements[--size];
+        elements[size] = null; // Eliminate obsolete reference
+        if (size > 0 && size == elements.length / 4) {
+            resize(elements.length / 2); // Shrink the array size if it's 1/4 full
+        }
+        return item;
+    }
+
+    @Override
+    public E peek() throws EmptyStackException {
+        if (isEmpty()) {
+            throw new EmptyStackException();
+        }
+        return elements[size - 1];
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    @Override
+    public int size() {
+        return size;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void resize(int newCapacity) {
+        E[] newArray = (E[]) new Object[newCapacity];
+        System.arraycopy(elements, 0, newArray, 0, size);
+        elements = newArray;
+    }
+
+    public static void main(String[] args) {
+        Stack<Integer> stack = new ArrayStack<>();
+        stack.push(1);
+        stack.push(2);
+        stack.push(3);
+
+        System.out.println(stack.pop()); // Output: 3
+        System.out.println(stack.peek()); // Output: 2
+        System.out.println(stack.isEmpty()); // Output: false
+    }
+}
